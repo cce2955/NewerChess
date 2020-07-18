@@ -1,16 +1,8 @@
 package logic;
 
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.transaction.xa.XAResource;
-
-import org.junit.platform.commons.util.BlacklistedExceptions;
-
-import piece.ChessPiece.Color;
-import piece.ChessPiece.type;
 import piece.Movement;
 
 public class GameLogic {
@@ -26,11 +18,9 @@ public class GameLogic {
 	//Input for user
 	private Scanner input = new Scanner(System.in);
 	//store user input
-	private String rInput, type;
+	private String rInput;
 	//If true, end entire game, as long as this is set to false, keep game going
 	private boolean endGame;
-	//Check color
-	private String failString = "Not a valid piece, please try again";
 	private int id;
 	//Interface to calculate movement
 	Movement Add = (int x) -> x + 1;
@@ -51,8 +41,7 @@ public class GameLogic {
 				askForPiece();
 				break;
 			case FINDPIECE:
-				findAvailablePieces(getrInput());
-				
+				findAvailablePieces(getrInput());				
 				break;
 			default:
 				askForPiece();
@@ -64,7 +53,7 @@ public class GameLogic {
 		gen.pieceArr.forEach(item->{
 			if (item.getTYPE().toString().toLowerCase().charAt(0) == 
 					getrInput().charAt(0) &&
-					PLAYERCOLOR.toString().equals(item.getCOLOR().toString())) {
+					PLAYERCOLOR.toString().equals(item.getCOLOR().toString())){
 				setId(item.getId());
 		//Grabbing the ID so we can just grab the type to print out
 		//the spaces
@@ -79,8 +68,8 @@ public class GameLogic {
 					gen.pieceArr.get(getId()).getTYPE()) {
 				if(PLAYERCOLOR.toString().equals(
 						gen.pieceArr.get(i).getCOLOR().toString())) {
-					logicPieceArr.add(gen.letters[gen.pieceArr.get(i).getX()] 
-							+ gen.pieceArr.get(i).getY());
+					logicPieceArr.add(gen.letters[gen.pieceArr.get(i).getY()] 
+							+ gen.pieceArr.get(i).getX());
 					spaceCounter++;
 				}
 				
@@ -93,8 +82,11 @@ public class GameLogic {
 			System.out.print(" [" + logicPieceArr.get(i) + "] ");
 		}
 		System.out.println();
+		System.out.println("Which piece would you like to move? type in the "
+				+ "number, for example \"" + logicPieceArr.get(0) + "\" for "
+				+ " for [" + logicPieceArr.get(0) +"] ");
 	
-				STATUS = Status.ASKPIECE;
+		STATUS = Status.ASKPIECE;
 	}
 	private void askForPiece() {
 
@@ -147,13 +139,6 @@ public class GameLogic {
 	private void setrInput(String rInput) {
 
 		this.rInput = rInput;
-	}
-	private String getType() {
-		return type;
-	}
-	private void setType(String type) {
-
-		this.type = type;
 	}
 	private int getId() {
 		return id;

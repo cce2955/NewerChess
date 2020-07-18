@@ -11,12 +11,9 @@ public class BoardGeneration {
 	
 	ChessBoard board = new ChessBoard(8, 8 );
 	ChessPiece piece = new ChessPiece();
-	private int numPieces = getNumPieces();
 	ArrayList<ChessPiece> pieceArr = new ArrayList<>();
 	public String[] letters = {"A","B","C","D","E","F","G","H","I"};
-	private int getNumPieces(){
-		return (board.getColumns() * board.getRows() / 2);
-	}
+	
 	//Right now this works via console, but I may redo this with JFrame later
 	public void generatePieces() {
 		for(int i = 0; i <= board.getColumns(); i++) {
