@@ -9,7 +9,7 @@ import piece.ChessPiece.type;
 
 public class BoardGeneration {
 	
-	ChessBoard board = new ChessBoard(8, 8);
+	ChessBoard board = new ChessBoard(8, 8 );
 	ChessPiece piece = new ChessPiece();
 	private int numPieces = getNumPieces();
 	ArrayList<ChessPiece> pieceArr = new ArrayList<>();
@@ -19,38 +19,40 @@ public class BoardGeneration {
 	}
 	//Right now this works via console, but I may redo this with JFrame later
 	public void generatePieces() {
-		for(int i = 0; i < board.getColumns(); i++) {
+		for(int i = 0; i <= board.getColumns(); i++) {
 			//I was going to make the grid dynamic, but I don't have the math
 			//for this yet
-			pieceArr.add(new ChessPiece(i, type.PAWN, Color.WHITE, i, 1));
-			pieceArr.add(new ChessPiece(i, type.PAWN, Color.BLACK, i, 6));
-			switch(i) {
-			case 0:
-				pieceArr.add(new ChessPiece(i, type.ROOK, Color.WHITE, i, 0));
-				pieceArr.add(new ChessPiece(i, type.ROOK, Color.BLACK, i, 7));
-				pieceArr.add(new ChessPiece(i, type.ROOK, Color.WHITE, i + 7, 0));
-				pieceArr.add(new ChessPiece(i, type.ROOK, Color.BLACK, i + 7, 7));
-				break;
-			case 1:
-				pieceArr.add(new ChessPiece(i, type.HORSE, Color.WHITE, i, 0));
-				pieceArr.add(new ChessPiece(i, type.HORSE, Color.BLACK, i, 7));
-				pieceArr.add(new ChessPiece(i, type.HORSE, Color.WHITE, i + 5, 0));
-				pieceArr.add(new ChessPiece(i, type.HORSE, Color.BLACK, i + 5, 7));
-				break;
-			case 2:
-				pieceArr.add(new ChessPiece(i, type.BISHOP, Color.WHITE, i, 0));
-				pieceArr.add(new ChessPiece(i, type.BISHOP, Color.BLACK, i, 7));
-				pieceArr.add(new ChessPiece(i, type.BISHOP, Color.WHITE, i + 3, 0));
-				pieceArr.add(new ChessPiece(i, type.BISHOP, Color.BLACK, i + 3, 7));
-				break;
-			case 3:
-				pieceArr.add(new ChessPiece(i, type.QUEEN, Color.WHITE, i, 0));
-				pieceArr.add(new ChessPiece(i, type.QUEEN, Color.BLACK, i, 7));
-				break;
-			case 4:
-				pieceArr.add(new ChessPiece(i, type.KING, Color.WHITE, i, 0));
-				pieceArr.add(new ChessPiece(i, type.KING, Color.BLACK, i, 7));
-			
+			if(i > 0) {
+				pieceArr.add(new ChessPiece(i, type.PAWN, Color.WHITE, i, 1));
+				pieceArr.add(new ChessPiece(i, type.PAWN, Color.BLACK, i, 6));
+				switch(i) {
+				case 1:
+					pieceArr.add(new ChessPiece(i, type.ROOK, Color.WHITE, i, 0));
+					pieceArr.add(new ChessPiece(i, type.ROOK, Color.BLACK, i, 7));
+					pieceArr.add(new ChessPiece(i, type.ROOK, Color.WHITE, i + 7, 0));
+					pieceArr.add(new ChessPiece(i, type.ROOK, Color.BLACK, i + 7, 7));
+					break;
+				case 2:
+					pieceArr.add(new ChessPiece(i, type.HORSE, Color.WHITE, i, 0));
+					pieceArr.add(new ChessPiece(i, type.HORSE, Color.BLACK, i, 7));
+					pieceArr.add(new ChessPiece(i, type.HORSE, Color.WHITE, i + 5, 0));
+					pieceArr.add(new ChessPiece(i, type.HORSE, Color.BLACK, i + 5, 7));
+					break;
+				case 3:
+					pieceArr.add(new ChessPiece(i, type.BISHOP, Color.WHITE, i, 0));
+					pieceArr.add(new ChessPiece(i, type.BISHOP, Color.BLACK, i, 7));
+					pieceArr.add(new ChessPiece(i, type.BISHOP, Color.WHITE, i + 3, 0));
+					pieceArr.add(new ChessPiece(i, type.BISHOP, Color.BLACK, i + 3, 7));
+					break;
+				case 4:
+					pieceArr.add(new ChessPiece(i, type.QUEEN, Color.WHITE, i, 0));
+					pieceArr.add(new ChessPiece(i, type.QUEEN, Color.BLACK, i, 7));
+					break;
+				case 5:
+					pieceArr.add(new ChessPiece(i, type.KING, Color.WHITE, i, 0));
+					pieceArr.add(new ChessPiece(i, type.KING, Color.BLACK, i, 7));
+				
+				}
 			}
 		}
 		pieceArr.add(new ChessPiece(pieceArr.size(), type.DUMMY, Color.WHITE, 100, 100));
@@ -66,44 +68,45 @@ public class BoardGeneration {
 	}
 	
 	public void updateBoard() {
-		
+	
 		int y = 0;
-		int xCorrect = 0;
-		boolean pass = false;
-		int piece = 0;
-		for(int x = 0; x < board.getSpaces(); x++) {
-			pass = false;
-			//Reset the X after 8 passes so you can maintain the XY value
-			//ex (0,1)(0,2)...(0,7)(1,0)(1,1)
-			if (xCorrect % 8 == 0) {
-				xCorrect = 0;
+		int x = 1;
+		boolean pass = true;
+		for (int i = 1; i <= board.getSpaces(); i++) {
+			for (int lower = 0; lower < pieceArr.size(); lower++) {
+				if(pieceArr.get(lower).getX() == x
+						&& pieceArr.get(lower).getY() == y) {
+					switch(pieceArr.get(lower).getCOLOR()) {
+					case BLACK:
+						System.out.print(" [B" + 
+								pieceArr.get(lower).getTYPE().toString().charAt(0) +
+								"] ");
+						pass = false;
+						break;
+					case WHITE:
+						System.out.print(" [W" + 
+								pieceArr.get(lower).getTYPE().toString().charAt(0) +
+								"] ");
+						pass = false;
+						break;
+					default:
+						break;
+					}	
+				}	
 			}
-			if(x > 1 && x % 8 == 0) {
-				System.out.println();
+			if(pass) {
+				System.out.print(" [" + letters[y] + (x) + "] ");
+			}
+			
+			if (i % 8 == 0) {
+				x = 0;
 				y++;
+				System.out.println();
 			}
-			for(int i = 0; i < pieceArr.size(); i++) {
-				if(pieceArr.get(i).getX() == xCorrect && pieceArr.get(i).getY() == y) {
-					pass = true;
-					piece = i;
-				}
-			}
-			xCorrect++;
-			if (pass) {
-				//If the piece passed all the checks, print out the piece it is
-				//If the player is black, attach a B in front of the piece
-				if(pieceArr.get(piece).getCOLOR() == Color.BLACK) {
-					System.out.print(" [B" + pieceArr.get(piece).getTYPE().toString().charAt(0) +  "] ");
-				} else {
-					System.out.print(" [W" + pieceArr.get(piece).getTYPE().toString().charAt(0) +  "] ");
-				}
-				
-			} else {
-				//Otherwise just print out the gridspace
-				System.out.print(" [" + letters[y] + xCorrect +  "] ");
-			}
+			pass = true;
+			x++;
+			
 		}
-		System.out.println();
 		System.out.println();
 	}
 
