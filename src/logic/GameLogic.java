@@ -75,7 +75,7 @@ public class GameLogic {
 		//local init
 		int y = 0;
 		int x = Character.getNumericValue(input.charAt(1));
-		int finalY = y;
+		
 		int potentialX = 0;
 		int potentialY = 0;
 		boolean pass = false;
@@ -88,17 +88,16 @@ public class GameLogic {
 			}
 		}
 		
-		gen.pieceArr.forEach(item ->{
-			//Get the actual ID of the piece so we know exactly what we're
-			//working with
-			if(item.getX() == finalY + 1 && item.getY() == x) {
-				setId(item.getId());
-				System.out.println(getId());
+		for (int i = 0; i < gen.pieceArr.size(); i++) {
+			if(gen.pieceArr.get(i).getX() == y
+					&& gen.pieceArr.get(i).getY() == x) {
+				setId(gen.pieceArr.get(i).getId());
 			}
-		});
+		}
 		
 		switch(gen.pieceArr.get(getId()).getTYPE()) {
 			case PAWN:
+				
 				potentialX = Add.movePiece(gen.pieceArr.get(getId()).getY());
 				
 				spaceArr.add(gen.letters[potentialX] + y);
