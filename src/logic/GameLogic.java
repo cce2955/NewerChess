@@ -8,7 +8,7 @@ import piece.Movement;
 public class GameLogic {
 	private enum Status{
 		ASKPIECE,FINDPIECE,MOVEPIECE,
-		AVAILABLESPACE, ASKSPACE
+		FINDSPACE, ASKSPACE
 	}
 	private enum PlayerColor{
 		WHITE, BLACK
@@ -43,9 +43,86 @@ public class GameLogic {
 			case FINDPIECE:
 				findAvailablePieces(getrInput());				
 				break;
+			case ASKSPACE:
+				findAvailableSpace(getrInput());
+				break;
+			case FINDSPACE:
+				moveToSpace(getrInput());
+				break;
 			default:
 				askForPiece();
 			}
+		
+	}
+	private boolean collision() {
+		
+		return true;
+	}
+	private void moveToSpace(String input) {
+		int y = 0;
+		int x = Character.getNumericValue(input.charAt(1));
+		for(int i = 0; i < gen.letters.length; i++) {
+			if(input.charAt(0) == gen.letters[i].toLowerCase().charAt(0)) {
+				//Actually find Y
+				y = i;
+			}
+		}//Get the XY value as usual
+		gen.pieceArr.get(getId()).setX(x);
+		gen.pieceArr.get(getId()).setY(y);
+		STATUS = Status.ASKPIECE;	
+	}
+	private void findAvailableSpace(String input) {
+		//local init
+		int y = 0;
+		int x = Character.getNumericValue(input.charAt(1));
+		int finalY = y;
+		int potentialX = 0;
+		int potentialY = 0;
+		boolean pass = false;
+		ArrayList<String> spaceArr = new ArrayList<>();
+		spaceArr.clear();
+		for(int i = 0; i < gen.letters.length; i++) {
+			if(input.charAt(0) == gen.letters[i].toLowerCase().charAt(0)) {
+				//Actually find Y
+				y = i;
+			}
+		}
+		
+		gen.pieceArr.forEach(item ->{
+			//Get the actual ID of the piece so we know exactly what we're
+			//working with
+			if(item.getX() == finalY + 1 && item.getY() == x) {
+				setId(item.getId());
+				System.out.println(getId());
+			}
+		});
+		
+		switch(gen.pieceArr.get(getId()).getTYPE()) {
+			case PAWN:
+				potentialX = Add.movePiece(gen.pieceArr.get(getId()).getY());
+				
+				spaceArr.add(gen.letters[potentialX] + y);
+				if(gen.pieceArr.get(getId()).isFirst()) {
+					potentialX = Add.movePiece(potentialX);
+					spaceArr.add(gen.letters[potentialX] + y);
+					gen.pieceArr.get(getId()).setFirst(false);
+					pass = true;
+				}
+			default:
+				break;
+		}
+		System.out.println("Your available spaces are: ");
+		for (int i = 0; i < spaceArr.size(); i++) {
+			System.out.print(" [" + spaceArr.get(i) + "] ");
+		}
+		System.out.println("Please input a number like " + spaceArr.get(0));
+		setrInput(this.input.nextLine());
+		if (pass) {
+			STATUS = Status.FINDSPACE;
+		}else{
+			STATUS = Status.ASKPIECE;
+		}
+		
 		
 	}
 	private void findAvailablePieces(String input) {
@@ -82,11 +159,23 @@ public class GameLogic {
 			System.out.print(" [" + logicPieceArr.get(i) + "] ");
 		}
 		System.out.println();
-		System.out.println("Which piece would you like to move? type in the "
+		System.out.println("Which piece would you like to move to? type in the "
 				+ "number, for example \"" + logicPieceArr.get(0) + "\" for "
 				+ " for [" + logicPieceArr.get(0) +"] ");
-	
-		STATUS = Status.ASKPIECE;
+		setrInput(this.input.nextLine());
+		for(int i = 0; i < gen.pieceArr.size();i++) {
+		
+			if(getrInput().toLowerCase().equals(gen.letters[gen.pieceArr.get(i).getY()]
+					.toLowerCase() 
+					+ gen.pieceArr.get(i).getX())) {
+				STATUS = Status.ASKSPACE;
+				break;
+				
+			}else {
+				STATUS = Status.ASKPIECE;
+			}
+		}
+		
 	}
 	private void askForPiece() {
 

@@ -52,7 +52,8 @@ public class BoardGeneration {
 				}
 			}
 		}
-		pieceArr.add(new ChessPiece(pieceArr.size(), type.DUMMY, Color.WHITE, 100, 100));
+		
+		
 		//Set a unique ID for each piece, moreso for debugging than anything else
 		//Might be used to fetch during user input
 		for(int i = 0; i < pieceArr.size(); i++) {
