@@ -89,8 +89,8 @@ public class GameLogic {
 		}
 		
 		for (int i = 0; i < gen.pieceArr.size(); i++) {
-			if(gen.pieceArr.get(i).getX() == y
-					&& gen.pieceArr.get(i).getY() == x) {
+			if(gen.pieceArr.get(i).getX() == x
+					&& gen.pieceArr.get(i).getY() == y) {
 				setId(gen.pieceArr.get(i).getId());
 			}
 		}
