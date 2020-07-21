@@ -3,6 +3,8 @@ package logic;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import piece.ChessPiece;
+import piece.ChessPiece.type;
 import piece.Movement;
 
 public class GameLogic {
@@ -25,8 +27,10 @@ public class GameLogic {
 	//Interface to calculate movement
 	Movement Add = (int x) -> x + 1;
 	Movement Sub = (int x) -> x - 1;
+	//Enums
 	Status STATUS;
 	PlayerColor PLAYERCOLOR;
+	
 	public void start() {
 		gen.generatePieces();
 		getColor();
@@ -34,7 +38,17 @@ public class GameLogic {
 		//gen.updateBoard();
 		setEndGame(false);//Force game in endless loop
 	}
+	
 	public void update() {
+		if(getrInput().equalsIgnoreCase("check")) {
+			//little output debugger
+			System.out.println("ID: " + gen.pieceArr.get(getId()).getId());
+			System.out.println("X: " + gen.pieceArr.get(getId()).getX());
+			System.out.println("Y: " + gen.pieceArr.get(getId()).getX());
+			setDummy();
+			
+		}
+		
 		switch(STATUS) {
 			case ASKPIECE:
 				gen.updateBoard();
@@ -54,76 +68,132 @@ public class GameLogic {
 			}
 		
 	}
-	private boolean collision() {
-		
+	private void setDummy() {
+		//Sets the ID of the piece to dummy when applicable
+		//There is a slight bug where the setID will overwrite the current
+		//ID in some scenarios, so this will overwrite the ID with an 
+		//unreachable piece
+		for(int i = 0; i < gen.pieceArr.size(); i++) {
+			if(gen.pieceArr.get(i).getTYPE().equals(type.DUMMY)) {
+				setId(gen.getPieceArr().get(i).getId());
+			}
+		}
+	}
+	private boolean findCollision(String input) {
+		//The input is a potential choice the user can choose from
+		//If the potential choice happens to exist as a piece, 
+		//we have a collision
+		for(int i = 0; i < gen.pieceArr.size(); i++) {
+			if(gen.pieceArr.get(i).getTYPE() != type.DUMMY
+					&& input.equals(gen.letters[gen.pieceArr.get(i).getX()]
+					+ gen.pieceArr.get(i).getY())) {
+				return false;
+			}		
+		}
+		//Apparently we're returning true if there is no collision
+		//I'm done trying to wrestle with semantics
 		return true;
 	}
+	
 	private void moveToSpace(String input) {
-		int y = 0;
-		int x = Character.getNumericValue(input.charAt(1));
+		int x = 0;
+		int y = Character.getNumericValue(input.charAt(1));
 		for(int i = 0; i < gen.letters.length; i++) {
 			if(input.charAt(0) == gen.letters[i].toLowerCase().charAt(0)) {
-				//Actually find Y
-				y = i;
+				//Actually find X
+				x = i;
 			}
 		}//Get the XY value as usual
-		gen.pieceArr.get(getId()).setX(x);
-		gen.pieceArr.get(getId()).setY(y);
+		if(gen.getPieceArr().get(getId()).getTYPE() != type.DUMMY
+				//This will check if the second character is correct
+				//I fully expect this to break in the future but for now
+				//I'm letting this band aid ride until it falls off
+				&& input.charAt(1) == Integer.toString(y).charAt(0)) {
+			gen.pieceArr.get(getId()).setX(y);
+			gen.pieceArr.get(getId()).setY(x);
+			
+		}
+		
 		STATUS = Status.ASKPIECE;	
 	}
+	
 	private void findAvailableSpace(String input) {
 		//local init
+		int x = 0;
+		//Assign Y from the input
 		int y = 0;
-		int x = Character.getNumericValue(input.charAt(1));
 		
-		int potentialX = 0;
-		int potentialY = 0;
-		boolean pass = false;
-		ArrayList<String> spaceArr = new ArrayList<>();
-		spaceArr.clear();
-		for(int i = 0; i < gen.letters.length; i++) {
-			if(input.charAt(0) == gen.letters[i].toLowerCase().charAt(0)) {
-				//Actually find Y
-				y = i;
-			}
-		}
-		
-		for (int i = 0; i < gen.pieceArr.size(); i++) {
-			if(gen.pieceArr.get(i).getX() == x
-					&& gen.pieceArr.get(i).getY() == y) {
-				setId(gen.pieceArr.get(i).getId());
-			}
-		}
-		
-		switch(gen.pieceArr.get(getId()).getTYPE()) {
-			case PAWN:
-				
-				potentialX = Add.movePiece(gen.pieceArr.get(getId()).getY());
-				
-				spaceArr.add(gen.letters[potentialX] + y);
-				if(gen.pieceArr.get(getId()).isFirst()) {
-					potentialX = Add.movePiece(potentialX);
-					spaceArr.add(gen.letters[potentialX] + y);
-					gen.pieceArr.get(getId()).setFirst(false);
-					pass = true;
+		try { //This is the ugliest try catch I've done, I should
+			//Just toss this in a method but I am too burnt out to care at the
+			//Moment
+			y = Character.getNumericValue(input.charAt(1));
+
+			int potentialX = 0;
+			int potentialY = 0;
+			boolean pass = false;
+			ArrayList<String> spaceArr = new ArrayList<>();
+			spaceArr.clear();
+			for(int i = 0; i < gen.letters.length; i++) {
+				if(input.charAt(0) == gen.letters[i].toLowerCase().charAt(0)) {
+					//Actually find X
+					x = i;
 				}
-			default:
-				break;
-		}
-		System.out.println("Your available spaces are: ");
-		for (int i = 0; i < spaceArr.size(); i++) {
-			System.out.print(" [" + spaceArr.get(i) + "] ");
-		}
-		System.out.println("Please input a number like " + spaceArr.get(0));
-		setrInput(this.input.nextLine());
-		if (pass) {
-			STATUS = Status.FINDSPACE;
-		}else{
+			}
+			
+			for (int i = 0; i < gen.pieceArr.size(); i++) {
+				//X and Y are switched because I wasn't paying enough attention
+				//This will be a problem later but that's for later me to complain
+				//about, get your ctrl+ f ready
+				if(gen.pieceArr.get(i).getX() == y
+						&& gen.pieceArr.get(i).getY() == x) {
+					setId(gen.pieceArr.get(i).getId());
+				}
+			}
+			
+			switch(gen.pieceArr.get(getId()).getTYPE()) {
+				case PAWN:	
+					//HERE'S THE PROBLEM!!!
+					potentialX = Add.movePiece(gen.pieceArr.get(getId()).getY());
+					if(!findCollision(gen.letters[potentialX] + y)) {
+						spaceArr.add(gen.letters[potentialX] + y);
+					}
+					if(gen.pieceArr.get(getId()).isFirst() &&
+							!findCollision(gen.letters[potentialX] 
+									+ y)) {
+						potentialX = Add.movePiece(potentialX);
+						spaceArr.add(gen.letters[potentialX] + y);
+						gen.pieceArr.get(getId()).setFirst(false);
+					}
+					
+					pass = true;
+				default:
+					break;
+			}
+			System.out.println("Your available spaces are: ");
+			for (int i = 0; i < spaceArr.size(); i++) {
+				System.out.print(" [" + spaceArr.get(i) + "] ");
+			}
+			try {
+				//A quick print to show the user what to enter
+				System.out.println("Please input a number like " + spaceArr.get(0));
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("There are no spaces available");
+				pass = false;
+			}
+			
+			setrInput(this.input.nextLine());
+			if (pass) {
+				STATUS = Status.FINDSPACE;
+			}else{
+				STATUS = Status.ASKPIECE;
+			}
+			
+		}catch (NumberFormatException e) {
 			STATUS = Status.ASKPIECE;
 		}
 		
-		
 	}
+	
 	private void findAvailablePieces(String input) {
 		
 		gen.pieceArr.forEach(item->{
@@ -135,7 +205,9 @@ public class GameLogic {
 		//the spaces
 			}
 		});
-		
+		//Array that holds all potential spaces
+		//If you choose a bishop and there are two bishops
+		//available, it will show you the space of both bishops
 		ArrayList<String> logicPieceArr = new ArrayList<>();
 		logicPieceArr.clear();
 		int spaceCounter = 0;
@@ -163,10 +235,12 @@ public class GameLogic {
 				+ " for [" + logicPieceArr.get(0) +"] ");
 		setrInput(this.input.nextLine());
 		for(int i = 0; i < gen.pieceArr.size();i++) {
-		
-			if(getrInput().toLowerCase().equals(gen.letters[gen.pieceArr.get(i).getY()]
-					.toLowerCase() 
-					+ gen.pieceArr.get(i).getX())) {
+			if(gen.pieceArr.get(i).getTYPE() != type.DUMMY
+					&& getrInput().toLowerCase().equals(
+					gen.letters[gen.pieceArr.get(i).getY()].toLowerCase() 
+					+ gen.pieceArr.get(i).getX()) 
+					) {
+				//If the user types in something valid, then do stuff
 				STATUS = Status.ASKSPACE;
 				break;
 				
@@ -176,9 +250,15 @@ public class GameLogic {
 		}
 		
 	}
+	
 	private void askForPiece() {
 
 		System.out.println("Type which piece you wish to use. \n (Ex. P for pawn, B for bishop, etc.)");
+		for(int i = 0; i < gen.pieceArr.size(); i++) {
+			if(gen.pieceArr.get(i).getTYPE().equals(type.DUMMY)) {
+				setId(gen.getPieceArr().get(i).getId());
+			}
+		}
 		setrInput(input.nextLine());
 		while(!getrInput().equalsIgnoreCase("p") && 
 				!getrInput().equalsIgnoreCase("h") &&
@@ -192,6 +272,7 @@ public class GameLogic {
 		
 		STATUS = Status.FINDPIECE;
 	}
+	
 	private void getColor() {
 		System.out.println("Which color do you wish to use? (Type White "
 				+ "or Black)");
